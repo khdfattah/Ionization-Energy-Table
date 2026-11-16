@@ -62,46 +62,25 @@ successive_ie = {
 
 c1, c2, c3 = st.columns(3)
 with c1:
-    data_view = st.selectbox(
-        "👁️ البيانات المعروضة:",
-        ["المدمج: طاقة التأين + الطاقة المدارية (IE & E)", "طاقة التأين فقط (IE₁ kJ/mol)", "الطاقة المدارية فقط (E = n + ℓ)"]
-    )
+    data_view = st.selectbox("👁️ البيانات المعروضة:", ["المدمج: طاقة التأين + الطاقة المدارية (IE & E)", "طاقة التأين فقط (IE₁ kJ/mol)", "الطاقة المدارية فقط (E = n + ℓ)"])
 with c2:
-    color_mode = st.selectbox(
-        "🎨 نظام تلوين الجدول:",
-        ["خريطة حرارية لطاقة التأين (IE₁ Heatmap)", "ألوان الفئات المدارية (S, P, D, F, G)"]
-    )
+    color_mode = st.selectbox("🎨 نظام تلوين الجدول:", ["خريطة حرارية لطاقة التأين (IE₁ Heatmap)", "ألوان الفئات المدارية (S, P, D, F, G)"])
 with c3:
-    selected_el = st.selectbox(
-        "🔬 محلل القفزات الطاقية (اختر عنصراً):",
-        list(successive_ie.keys())
-    )
+    selected_el = st.selectbox("🔬 محلل القفزات الطاقية (اختر عنصراً):", list(successive_ie.keys()))
 
 ie1, ie2, ie3, reason = successive_ie.get(selected_el)
-st.markdown(f"""
-<div class="jump-card">
-    <strong>🔬 تحليل طاقات التأين المتتالية ({selected_el}):</strong> 
-    <strong>IE₁</strong> = {ie1} | <strong>IE₂</strong> = {ie2} | <strong>IE₃</strong> = {ie3} (kJ/mol)<br>
-    <span style="color:#9b2c2c;">💡 <strong>التفسير الكمي:</strong> {reason}</span>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(f"<div class='jump-card'><strong>🔬 تحليل طاقات التأين المتتالية ({selected_el}):</strong> <strong>IE₁</strong> = {ie1} | <strong>IE₂</strong> = {ie2} | <strong>IE₃</strong> = {ie3} (kJ/mol)<br><span style='color:#9b2c2c;'>💡 <strong>التفسير الكمي:</strong> {reason}</span></div>", unsafe_allow_html=True)
 
 def get_heat_color(z):
     if z not in ie1_dict:
         return "#e2e8f0"
     v = ie1_dict.get(z)
-    if v < 550:
-        return "#fefcbf"
-    elif v < 750:
-        return "#faf089"
-    elif v < 1000:
-        return "#fbd38d"
-    elif v < 1400:
-        return "#f6ad55"
-    elif v < 1800:
-        return "#fc8181"
-    else:
-        return "#f56565"
+    if v < 550: return "#fefcbf"
+    elif v < 750: return "#faf089"
+    elif v < 1000: return "#fbd38d"
+    elif v < 1400: return "#f6ad55"
+    elif v < 1800: return "#fc8181"
+    else: return "#f56565"
 
 orbitals = [('s','s-block',0)] + [(f'p{i}','p-block',1) for i in range(1,4)] + [(f'd{i}','d-block',2) for i in range(1,6)] + [(f'f{i}','f-block',3) for i in range(1,8)] + [(f'g{i}','g-block',4) for i in range(1,10)]
 
@@ -164,3 +143,7 @@ html += f'<tr><th class="shell-col">Orbital (ℓ)</th>{header_cells}</tr>'
 html += render_rows(top_half)
 html += '<tr><td colspan="26" style="height:14px; border:none;"></td></tr>'
 html += render_rows(bottom_half)
+html += '<tr><th class="shell-col">Blocks</th><th class="s-block">S-Block</th><th colspan="3" class="p-block">P-Block</th><th colspan="5" class="d-block">D-Block</th><th colspan="7" class="f-block">F-Block</th><th colspan="9" class="g-block">G-Block</th></tr>'
+html += '</table></div>'
+
+st.markdown(html, unsafe_allow_html=True)
