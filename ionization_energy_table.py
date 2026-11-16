@@ -85,7 +85,7 @@ def get_heat_color(z):
     elif v < 1800: return "#fc8181"
     else: return "#f56565"
 
-orbitals = [('s','s-block')] + [(f'p{i}','p-block') for i in range(1,4)] + [(f'd{i}','d-block') for i in range(1,6)] + [(f'f{i}','f-block') for i in range(1,8)] + [(f'g{i}','g-block') for i in range(1,10)]
+orbitals = [('s','s-block',0)] + [(f'p{i}','p-block',1) for i in range(1,4)] + [(f'd{i}','d-block',2) for i in range(1,6)] + [(f'f{i}','f-block',3) for i in range(1,8)] + [(f'g{i}','g-block',4) for i in range(1,10)]
 
 top_half = [
     ("8", [(119,'119',8),(0,'',9),(0,'',9),(0,'',9)]),
@@ -114,7 +114,7 @@ def render_rows(rows):
     for shell, cells in rows:
         sec += f'<tr><td class="shell-col">{shell}</td>'
         for i in range(25):
-            orb_name, block_cls = orbitals[i]
+            orb_name, block_cls, l_val = orbitals[i]
             if i < len(cells):
                 z, sym, e_val = cells[i]
                 ie_val = ie1_dict.get(z, "Theo.") if z > 0 else ""
@@ -132,18 +132,18 @@ def render_rows(rows):
     return sec
 
 html = '<div style="overflow-x:auto;"><table class="matrix-table">'
-html += '<tr><th class="shell-col">Shell/Orbital</th>' + ''.join([f'<th class="shell-col">{o}</th>' for o in orbitals]) + '</tr>'
+html += '<tr><th class="shell-col">Orbital (ℓ)</th>' + ''.join([f'<th class="shell-col">{o[0]}<br>(ℓ={o[2]})</th>' for o in orbitals]) + '</tr>'
 html += render_rows(top_half)
 html += '<tr><td colspan="26" style="height:14px; border:none;"></td></tr>'
 html += render_rows(bottom_half)
 html += '''
 <tr>
-    <th class="shell-col">Blocks (ℓ)</th>
-    <th class="s-block">S-Block<br>(ℓ = 0)</th>
-    <th colspan="3" class="p-block">P-Block<br>(ℓ = 1)</th>
-    <th colspan="5" class="d-block">D-Block<br>(ℓ = 2)</th>
-    <th colspan="7" class="f-block">F-Block<br>(ℓ = 3)</th>
-    <th colspan="9" class="g-block">G-Block<br>(ℓ = 4)</th>
+    <th class="shell-col">Blocks</th>
+    <th class="s-block">S-Block</th>
+    <th colspan="3" class="p-block">P-Block</th>
+    <th colspan="5" class="d-block">D-Block</th>
+    <th colspan="7" class="f-block">F-Block</th>
+    <th colspan="9" class="g-block">G-Block</th>
 </tr>
 </table></div>
 '''
