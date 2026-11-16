@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title=Periodic Table (Orbital Energy & Ionization Energy) | Dr. Khalid Abdelfattah M. Osman",
+    page_title="Periodic Table (Orbital Energy & Ionization Energy) | Dr. Khalid Abdelfattah M. Osman",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
