@@ -21,7 +21,7 @@ st.markdown("""
     .f-block { background-color: #f4b084; color: #000; }
     .g-block { background-color: #d9d9d9; color: #000; }
     .ie-badge { font-size: 9.5px; background: rgba(255,255,255,0.85); border-radius: 3px; padding: 1px 3px; display: block; margin-top: 2px; color: #1a202c; font-weight: bold; }
-    .e-tag { font-size: 8.5px; color: #2d3748; display: block; }
+    .e-tag { font-size: 8.5px; color: #2d3748; display: block; margin-top: 1px; font-weight: 600; }
     .jump-card { background-color: #f7fafc; border-left: 5px solid #c53030; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-size: 0.9rem; }
 </style>
 """, unsafe_allow_html=True)
@@ -60,13 +60,24 @@ successive_ie = {
     "20 Ca": (590, 1145, 4912, "قفزة كبيرة في IE₃ بعد فقد إلكتروني التكافؤ في 4s².")
 }
 
-c1, c2 = st.columns(2)
+c1, c2, c3 = st.columns(3)
 with c1:
-    color_mode = st.selectbox("🎨 نظام تلوين الجدول:", ["خريطة حرارية لطاقة التأين (IE₁ Heatmap)", "ألوان الفئات المدارية (S, P, D, F, G)"])
+    data_view = st.selectbox(
+        "👁️ البيانات المعروضة:",
+        ["المدمج: طاقة التأين + الطاقة المدارية (IE & E)", "طاقة التأين فقط (IE₁ kJ/mol)", "الطاقة المدارية فقط (E = n + ℓ)"]
+    )
 with c2:
-    selected_el = st.selectbox("🔬 محلل القفزات الطاقية (اختر عنصراً):", list(successive_ie.keys()))
+    color_mode = st.selectbox(
+        "🎨 نظام تلوين الجدول:",
+        ["خريطة حرارية لطاقة التأين (IE₁ Heatmap)", "ألوان الفئات المدارية (S, P, D, F, G)"]
+    )
+with c3:
+    selected_el = st.selectbox(
+        "🔬 محلل القفزات الطاقية (اختر عنصراً):",
+        list(successive_ie.keys())
+    )
 
-ie1, ie2, ie3, reason = successive_ie[selected_el]
+ie1, ie2, ie3, reason = successive_ie.get(selected_el)
 st.markdown(f"""
 <div class="jump-card">
     <strong>🔬 تحليل طاقات التأين المتتالية ({selected_el}):</strong> 
@@ -76,47 +87,59 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 def get_heat_color(z):
-    if z not in ie1_dict: return "#e2e8f0"
-    v = ie1_dict[z]
-    if v < 550: return "#fefcbf"
-    elif v < 750: return "#faf089"
-    elif v < 1000: return "#fbd38d"
-    elif v < 1400: return "#f6ad55"
-    elif v < 1800: return "#fc8181"
-    else: return "#f56565"
+    if z not in ie1_dict:
+        return "#e2e8f0"
+    v = ie1_dict.get(z)
+    if v < 550:
+        return "#fefcbf"
+    elif v < 750:
+        return "#faf089"
+    elif v < 1000:
+        return "#fbd38d"
+    elif v < 1400:
+        return "#f6ad55"
+    elif v < 1800:
+        return "#fc8181"
+    else:
+        return "#f56565"
 
-orbitals = [('s','s-block',0)] + [(f'p{i}','p-block',1) for i in range(1,4)] + [(f'd{i}','d-block',2) for i in range(1,6)] + [(f'f{i}','f-block',3) for i in range(1,8)] + [(f'g{i}','g-block',4) for i in range(1,10)]
+orbitals = list([
+    ('s','s-block',0),
+    ('p1','p-block',1),('p2','p-block',1),('p3','p-block',1),
+    ('d1','d-block',2),('d2','d-block',2),('d3','d-block',2),('d4','d-block',2),('d5','d-block',2),
+    ('f1','f-block',3),('f2','f-block',3),('f3','f-block',3),('f4','f-block',3),('f5','f-block',3),('f6','f-block',3),('f7','f-block',3),
+    ('g1','g-block',4),('g2','g-block',4),('g3','g-block',4),('g4','g-block',4),('g5','g-block',4),('g6','g-block',4),('g7','g-block',4),('g8','g-block',4),('g9','g-block',4)
+])
 
-top_half = [
-    ("8", [(119,'119',8),(0,'',9),(0,'',9),(0,'',9)]),
-    ("7", [(87,'87 Fr',7),(113,'113 Nh',8),(114,'114 Fl',8),(115,'115 Mc',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10)]),
-    ("6", [(55,'55 Cs',6),(81,'81 Tl',7),(82,'82 Pb',7),(83,'83 Bi',7),(103,'103 Lr',8),(104,'104 Rf',8),(105,'105 Db',8),(106,'106 Sg',8),(107,'107 Bh',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9)]),
-    ("5", [(37,'37 Rb',5),(49,'49 In',6),(50,'50 Sn',6),(51,'51 Sb',6),(71,'71 Lu',7),(72,'72 Hf',7),(73,'73 Ta',7),(74,'74 W',7),(75,'75 Re',7),(89,'89 Ac',8),(90,'90 Th',8),(91,'91 Pa',8),(92,'92 U',8),(93,'93 Np',8),(94,'94 Pu',8),(95,'95 Am',8),(121,'121',9),(122,'122',9),(123,'123',9),(124,'124',9),(125,'125',9),(126,'126',9),(127,'127',9),(128,'128',9),(129,'129',9)]),
-    ("4", [(19,'19 K',4),(31,'31 Ga',5),(32,'32 Ge',5),(33,'33 As',5),(39,'39 Y',6),(40,'40 Zr',6),(41,'41 Nb',6),(42,'42 Mo',6),(43,'43 Tc',6),(57,'57 La',7),(58,'58 Ce',7),(59,'59 Pr',7),(60,'60 Nd',7),(61,'61 Pm',7),(62,'62 Sm',7),(63,'63 Eu',7)]),
-    ("3", [(11,'11 Na',3),(13,'13 Al',4),(14,'14 Si',4),(15,'15 P',4),(21,'21 Sc',5),(22,'22 Ti',5),(23,'23 V',5),(24,'24 Cr',5),(25,'25 Mn',5)]),
-    ("2", [(3,'3 Li',2),(5,'5 B',3),(6,'6 C',3),(7,'7 N',3)]),
-    ("1", [(1,'1 H',1)])
-]
+top_half = list([
+    ("8", list([(119,'119',8),(0,'',9),(0,'',9),(0,'',9)])),
+    ("7", list([(87,'87 Fr',7),(113,'113 Nh',8),(114,'114 Fl',8),(115,'115 Mc',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10)])),
+    ("6", list([(55,'55 Cs',6),(81,'81 Tl',7),(82,'82 Pb',7),(83,'83 Bi',7),(103,'103 Lr',8),(104,'104 Rf',8),(105,'105 Db',8),(106,'106 Sg',8),(107,'107 Bh',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9)])),
+    ("5", list([(37,'37 Rb',5),(49,'49 In',6),(50,'50 Sn',6),(51,'51 Sb',6),(71,'71 Lu',7),(72,'72 Hf',7),(73,'73 Ta',7),(74,'74 W',7),(75,'75 Re',7),(89,'89 Ac',8),(90,'90 Th',8),(91,'91 Pa',8),(92,'92 U',8),(93,'93 Np',8),(94,'94 Pu',8),(95,'95 Am',8),(121,'121',9),(122,'122',9),(123,'123',9),(124,'124',9),(125,'125',9),(126,'126',9),(127,'127',9),(128,'128',9),(129,'129',9)])),
+    ("4", list([(19,'19 K',4),(31,'31 Ga',5),(32,'32 Ge',5),(33,'33 As',5),(39,'39 Y',6),(40,'40 Zr',6),(41,'41 Nb',6),(42,'42 Mo',6),(43,'43 Tc',6),(57,'57 La',7),(58,'58 Ce',7),(59,'59 Pr',7),(60,'60 Nd',7),(61,'61 Pm',7),(62,'62 Sm',7),(63,'63 Eu',7)])),
+    ("3", list([(11,'11 Na',3),(13,'13 Al',4),(14,'14 Si',4),(15,'15 P',4),(21,'21 Sc',5),(22,'22 Ti',5),(23,'23 V',5),(24,'24 Cr',5),(25,'25 Mn',5)])),
+    ("2", list([(3,'3 Li',2),(5,'5 B',3),(6,'6 C',3),(7,'7 N',3)])),
+    ("1", list([(1,'1 H',1)]))
+])
 
-bottom_half = [
-    ("1'", [(2,'2 He',1)]),
-    ("2'", [(4,'4 Be',2),(8,'8 O',3),(9,'9 F',3),(10,'10 Ne',3)]),
-    ("3'", [(12,'12 Mg',3),(16,'16 S',4),(17,'17 Cl',4),(18,'18 Ar',4),(26,'26 Fe',5),(27,'27 Co',5),(28,'28 Ni',5),(29,'29 Cu',5),(30,'30 Zn',5)]),
-    ("4'", [(20,'20 Ca',4),(34,'34 Se',5),(35,'35 Br',5),(36,'36 Kr',5),(44,'44 Ru',6),(45,'45 Rh',6),(46,'46 Pd',6),(47,'47 Ag',6),(48,'48 Cd',6),(64,'64 Gd',7),(65,'65 Tb',7),(66,'66 Dy',7),(67,'67 Ho',7),(68,'68 Er',7),(69,'69 Tm',7),(70,'70 Yb',7)]),
-    ("5'", [(38,'38 Sr',5),(52,'52 Te',6),(53,'53 I',6),(54,'54 Xe',6),(76,'76 Os',7),(77,'77 Ir',7),(78,'78 Pt',7),(79,'79 Au',7),(80,'80 Hg',7),(96,'96 Cm',8),(97,'97 Bk',8),(98,'98 Cf',8),(99,'99 Es',8),(100,'100 Fm',8),(101,'101 Md',8),(102,'102 No',8),(130,'130',9),(131,'131',9),(132,'132',9),(133,'133',9),(134,'134',9),(135,'135',9),(136,'136',9),(137,'137',9)]),
-    ("6'", [(56,'56 Ba',6),(84,'84 Po',7),(85,'85 At',7),(86,'86 Rn',7),(108,'108 Hs',8),(109,'109 Mt',8),(110,'110 Ds',8),(111,'111 Rg',8),(112,'112 Cn',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9)]),
-    ("7'", [(88,'88 Ra',7),(116,'116 Lv',8),(117,'117 Ts',8),(118,'118 Og',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10)]),
-    ("8'", [(120,'120',8),(0,'',9),(0,'',9),(0,'',9)])
-]
+bottom_half = list([
+    ("1'", list([(2,'2 He',1)])),
+    ("2'", list([(4,'4 Be',2),(8,'8 O',3),(9,'9 F',3),(10,'10 Ne',3)])),
+    ("3'", list([(12,'12 Mg',3),(16,'16 S',4),(17,'17 Cl',4),(18,'18 Ar',4),(26,'26 Fe',5),(27,'27 Co',5),(28,'28 Ni',5),(29,'29 Cu',5),(30,'30 Zn',5)])),
+    ("4'", list([(20,'20 Ca',4),(34,'34 Se',5),(35,'35 Br',5),(36,'36 Kr',5),(44,'44 Ru',6),(45,'45 Rh',6),(46,'46 Pd',6),(47,'47 Ag',6),(48,'48 Cd',6),(64,'64 Gd',7),(65,'65 Tb',7),(66,'66 Dy',7),(67,'67 Ho',7),(68,'68 Er',7),(69,'69 Tm',7),(70,'70 Yb',7)])),
+    ("5'", list([(38,'38 Sr',5),(52,'52 Te',6),(53,'53 I',6),(54,'54 Xe',6),(76,'76 Os',7),(77,'77 Ir',7),(78,'78 Pt',7),(79,'79 Au',7),(80,'80 Hg',7),(96,'96 Cm',8),(97,'97 Bk',8),(98,'98 Cf',8),(99,'99 Es',8),(100,'100 Fm',8),(101,'101 Md',8),(102,'102 No',8),(130,'130',9),(131,'131',9),(132,'132',9),(133,'133',9),(134,'134',9),(135,'135',9),(136,'136',9),(137,'137',9)])),
+    ("6'", list([(56,'56 Ba',6),(84,'84 Po',7),(85,'85 At',7),(86,'86 Rn',7),(108,'108 Hs',8),(109,'109 Mt',8),(110,'110 Ds',8),(111,'111 Rg',8),(112,'112 Cn',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9)])),
+    ("7'", list([(88,'88 Ra',7),(116,'116 Lv',8),(117,'117 Ts',8),(118,'118 Og',8),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',9),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10),(0,'',10)])),
+    ("8'", list([(120,'120',8),(0,'',9),(0,'',9),(0,'',9)]))
+])
 
 def render_rows(rows):
     sec = ''
     for shell, cells in rows:
         sec += f'<tr><td class="shell-col">{shell}</td>'
-        for i in range(25):
-            orb_name, block_cls, l_val = orbitals[i]
+        for i, (orb_name, block_cls, l_val) in enumerate(orbitals):
             if i < len(cells):
-                z, sym, e_val = cells[i]
+                z, sym, e_val = list(cells).__getitem__(i)
                 ie_val = ie1_dict.get(z, "Theo.") if z > 0 else ""
                 if "Heatmap" in color_mode:
                     bg_style = f'style="background-color:{get_heat_color(z)};"' if z > 0 else 'style="background-color:#f7fafc;"'
@@ -124,28 +147,16 @@ def render_rows(rows):
                 else:
                     bg_style = ""
                     td_cls = block_cls
-                content = f"<div><strong>{sym}</strong></div><span class='ie-badge'>{ie_val}</span><span class='e-tag'>E={e_val}</span>" if sym else f"<span class='e-tag'>E={e_val}</span>"
+                
+                if sym:
+                    if "IE & E" in data_view:
+                        content = f"<div><strong>{sym}</strong></div><span class='ie-badge'>{ie_val}</span><span class='e-tag'>E={e_val}</span>"
+                    elif "IE₁" in data_view:
+                        content = f"<div><strong>{sym}</strong></div><span class='ie-badge'>{ie_val}</span>"
+                    else:
+                        content = f"<div><strong>{sym}</strong></div><span class='e-tag'>E={e_val}</span>"
+                else:
+                    content = f"<span class='e-tag'>E={e_val}</span>"
                 sec += f'<td class="{td_cls}" {bg_style}>{content}</td>'
             else:
                 sec += '<td style="border:none;"></td>'
-        sec += '</tr>'
-    return sec
-
-html = '<div style="overflow-x:auto;"><table class="matrix-table">'
-html += '<tr><th class="shell-col">Orbital (ℓ)</th>' + ''.join([f'<th class="shell-col">{o[0]}<br>(ℓ={o[2]})</th>' for o in orbitals]) + '</tr>'
-html += render_rows(top_half)
-html += '<tr><td colspan="26" style="height:14px; border:none;"></td></tr>'
-html += render_rows(bottom_half)
-html += '''
-<tr>
-    <th class="shell-col">Blocks</th>
-    <th class="s-block">S-Block</th>
-    <th colspan="3" class="p-block">P-Block</th>
-    <th colspan="5" class="d-block">D-Block</th>
-    <th colspan="7" class="f-block">F-Block</th>
-    <th colspan="9" class="g-block">G-Block</th>
-</tr>
-</table></div>
-'''
-
-st.markdown(html, unsafe_allow_html=True)
