@@ -28,7 +28,7 @@ st.markdown("""
 
 st.markdown("""
 <div class="main-header">
-    <h2>⚡ Periodic Table (Orbital Energy & Ionization Energy) (الجدول الدوري للطاقة المدارية و الطاقة الأيونية)</h2>
+    <h2>⚡ Periodic Table (Orbital Energy & Ionization Energy) (الجدول الدوري / الطاقة المدارية و الطاقة الأيونية)</h2>
     <p><strong>By: Dr. Khalid Abdelfattah M. Osman</strong> | Merowe Institute of Technology, Merowe University of Technology, Sudan</p>
 </div>
 """, unsafe_allow_html=True)
